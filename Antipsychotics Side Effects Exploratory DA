@@ -1,0 +1,68 @@
+# uploading csv data
+from google.colab import files
+files.upload()
+
+
+# importing the csv
+import pandas as pd
+df = pd.read_csv("data.csv")
+df
+
+
+# unique values in the columns
+print(df['"DRUG"'].unique())
+print(df['"HAS_SIDE_EFFECT"'].unique())
+print(df['"SIDEEFFECT"'].unique())
+
+
+#shape of the table
+df.shape
+
+# datatypes of columns and counts
+df.info()
+
+
+# not descriptive statistics because no numerical values
+df.describe()
+
+
+# counts of unique values
+df['"SIDEEFFECT"'].value_counts()
+
+# missing values
+print("Null values in total:", df.isnull().sum().sum())
+print("\nBy column:\n", df.isnull().sum())
+
+# selecting the null s.ulms rows
+df[df["s.umls"].isnull() == True]
+
+# not removing null values, but replacing with blank
+df.fillna("", inplace=True)
+
+df[df["s.umls"].isnull() == True]
+
+# seaborn library for visualization
+# distribution of the side effects
+import seaborn as sns
+sns.countplot(data=df, x='"HAS_SIDE_EFFECT"')
+
+
+# same distribution shows the columns identify same thing
+sns.countplot(data=df, x='"SIDEEFFECT"')
+
+# not uniformly distributed and skewed
+sns.countplot(data=df, x='d.drugbank')
+
+# transform drugbank string to numbers for calculation
+from sklearn.preprocessing import LabelEncoder  
+# new column named d.drugbank_
+df['d.drugbank_'] = LabelEncoder().fit_transform(df['d.drugbank'])
+
+# boxplot which shows the quartiles, min/max, and outliers
+sns.boxplot(data=df, x='"SIDEEFFECT"', y='d.drugbank_')
+
+# numpy for quartiles 
+import numpy as np
+q75, q50, q25 = np.percentile(df['d.drugbank_'], [75, 50, 25])
+# interquartile range
+iqr = q75 - q25
